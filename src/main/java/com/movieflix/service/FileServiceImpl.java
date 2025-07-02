@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -21,6 +18,11 @@ public class FileServiceImpl implements FileService {
 
         // get original file name
         String filename = file.getOriginalFilename();
+
+        if(Files.exists(Paths.get(posters_path, filename))) {
+            throw new FileAlreadyExistsException("A file with the same name already exists! Please change the name.");
+        }
+
         if(filename == null || filename.isBlank()) {
             throw new FileNotFoundException("The file does not have a name.");
         }
@@ -31,8 +33,7 @@ public class FileServiceImpl implements FileService {
             Files.createDirectory(uploadDir);
         }
 
-        // copy file
-        Files.copy(file.getInputStream(), uploadDir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(file.getInputStream(), uploadDir.resolve(filename));
 
         return filename;
     }

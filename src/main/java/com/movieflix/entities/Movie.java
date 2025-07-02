@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
@@ -12,12 +12,12 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@Data
 public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer movieId;
+    private Integer id;
 
     @NotBlank(message = "Please provide movie's title!")   // app lvl, works only on String type
     @Column(nullable = false, length = 200) // db lvl
@@ -46,5 +46,5 @@ public class Movie {
 
     @NotBlank
     @Column(nullable = false)
-    private String poster;
+    private String posterFilename;
 }

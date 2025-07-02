@@ -4,17 +4,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class MovieDto {
 
-    @NotNull
-    private Integer movieId;
+    private Integer id;
 
     @NotBlank(message = "Please provide movie's title!")   // app lvl, works only on String type
     private String title;
@@ -30,9 +31,8 @@ public class MovieDto {
     @NotNull(message = "Please provide movie's release year!")
     private Integer releaseYear;
 
-    @NotBlank
-    private String poster;
+    private String posterFilename;
 
-    @NotBlank
+//    Gdy zmienimy sposób przechowywania plakatów, to wystarczy zmienić MovieDto a encję pozostawić bez zmian
     private String posterURL;
 }
