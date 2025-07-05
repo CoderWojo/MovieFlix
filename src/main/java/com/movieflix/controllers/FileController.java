@@ -3,6 +3,7 @@ package com.movieflix.controllers;
 import com.movieflix.service.FileService;
 import com.sun.net.httpserver.Headers;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,15 +33,15 @@ public class FileController {
     }
 
     @GetMapping("/{fileName}")
-    public void serveFileHandler(@PathVariable String fileName, HttpServletResponse response) throws FileNotFoundException, IOException {
+    public ResponseEntity<InputStreamResource> serveFileHandler(@PathVariable String fileName, HttpServletResponse response) throws FileNotFoundException, IOException {
+//        pobierz z warstwy serwisowej strumień do odczytu postera
         InputStream resourceFile = fileService.getResourceFile(fileName);
-        response.setContentType(MediaType.IMAGE_PNG_VALUE);
 
-//        mówi przeglądarce jak ma potraktować dane
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename= \"" + fileName + "\"");
-//        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"dzikus.png\"");
-        response.setHeader("X-Content-Type-Options", "nosniff");
+        InputStreamResource body = new InputStreamResource(resourceFile);
 
-        StreamUtils.copy(resourceFile, response.getOutputStream());
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                .body(body);
     }
 }

@@ -1,4 +1,9 @@
 package com.movieflix.exception;
 
-public class PosterNotFoundException {
+import java.io.FileNotFoundException;
+
+public class PosterNotFoundException extends FileNotFoundException {
+    public PosterNotFoundException(String message) {
+        super(message);
+    }
 }
