@@ -36,8 +36,8 @@ public class User implements UserDetails {
     @Size(min = 5, message = "The password must have at least 5 characters!")
     private String password;
 
-    @OneToOne(mappedBy = "user")
-    private RefreshToken refreshToken;
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<RefreshToken> refreshTokens;
 
     @Enumerated
     private UserRole role;

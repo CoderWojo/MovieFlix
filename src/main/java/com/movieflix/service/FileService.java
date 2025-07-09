@@ -1,6 +1,5 @@
 package com.movieflix.service;
 
-import com.movieflix.exception.PosterNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;

@@ -1,7 +1,6 @@
 package com.movieflix.service;
 
-import com.movieflix.exception.EmptyFileException;
-import com.movieflix.exception.PosterNotFoundException;
+import com.movieflix.exceptions.EmptyFileException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

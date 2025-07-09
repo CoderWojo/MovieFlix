@@ -3,7 +3,7 @@ package com.movieflix.service;
 import com.movieflix.dto.MovieDto;
 import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.entities.Movie;
-import com.movieflix.exception.MovieNotFoundException;
+import com.movieflix.exceptions.MovieNotFoundException;
 import com.movieflix.repository.MovieRepository;
 import com.movieflix.mapper.MovieMapper;
 import org.springframework.beans.factory.annotation.Value;

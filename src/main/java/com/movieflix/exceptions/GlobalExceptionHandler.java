@@ -1,4 +1,4 @@
-package com.movieflix.exception;
+package com.movieflix.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.BadRequestException;

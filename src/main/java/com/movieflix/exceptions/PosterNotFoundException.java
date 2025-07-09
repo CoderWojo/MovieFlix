@@ -1,4 +1,4 @@
-package com.movieflix.exception;
+package com.movieflix.exceptions;
 
 import java.io.FileNotFoundException;
 
