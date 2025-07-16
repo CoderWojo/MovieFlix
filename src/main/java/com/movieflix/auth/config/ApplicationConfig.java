@@ -20,8 +20,7 @@ public class ApplicationConfig {
     public ApplicationConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-// UserDetailsService
-    // AuthenticationProvider
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username)
@@ -29,7 +28,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    private AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService());
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 

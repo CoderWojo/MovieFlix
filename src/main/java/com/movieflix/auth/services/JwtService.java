@@ -42,7 +42,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-// po to aby nasz niewystarczająco długi klucz zamienić na prawidłowy i obudować go w obiekt Key który jest wyamgany
+    // po to aby nasz niewystarczająco długi klucz zamienić na prawidłowy i obudować go w obiekt Key który jest wyamgany
     // do .signWith
     private Key getSignInKey() {
         // decode SECRET_KEY
@@ -51,20 +51,20 @@ public class JwtService {
     }
 
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15min
+                .setExpiration(new Date(System.currentTimeMillis() + 10 * 1000)) // 15min, 10s
                 .signWith(getSignInKey())
                 .compact();
     }
 
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(String username) {
+        return generateToken(new HashMap<>(), username);
     }
 
     private Date extractExpiration(String token) {
@@ -75,7 +75,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-//    checking if token is not expired and whether belongs to the proper User
+    //    checking if token is not expired and whether belongs to the proper User
     public boolean isTokenValid(String token, UserDetails userDetails) {
         return extractUsername(token).equals(userDetails.getUsername()) && extractExpiration(token).after(new Date());
     }
