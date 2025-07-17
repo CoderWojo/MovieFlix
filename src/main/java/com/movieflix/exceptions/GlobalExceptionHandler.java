@@ -1,5 +1,7 @@
 package com.movieflix.exceptions;
 
+import com.movieflix.auth.exceptions.RefreshTokenOutOfDateException;
+import com.movieflix.auth.exceptions.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
@@ -7,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,16 +34,20 @@ public class GlobalExceptionHandler {
             EmptyFileException.class,
             IOException.class,
             BadRequestException.class,
-            MovieNotFoundException.class
+            MovieNotFoundException.class,
+            UserAlreadyExistsException.class,
+            UsernameNotFoundException.class,
+            BadCredentialsException.class,
+            RefreshTokenOutOfDateException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus status;
 
-        if(ex instanceof FileAlreadyExistsException) {
+        if(ex instanceof FileAlreadyExistsException || ex instanceof UserAlreadyExistsException) {
             status = HttpStatus.CONFLICT;
-        } else if(ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException) {
+        } else if(ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
             status = HttpStatus.NOT_FOUND;
-        } else if(ex instanceof EmptyFileException || ex instanceof BadRequestException) {
+        } else if(ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException ||ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
             status = HttpStatus.BAD_REQUEST;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -62,7 +70,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileAlreadyExistsException.class)
     public ProblemDetail handleFileAlreadyExistsException(FileAlreadyExistsException ex, HttpServletRequest request) throws URISyntaxException {
-//        Spring + Jackson automatycznie wrzucą te pola do JSON'a jako top-level (czyli na głównym poziomie)
+//        Spring + Jackson automatycznie wrzucą te pola do JSON'a jako top-level (czyli na głównym poziomie) i zwroca responseEntity
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
 //        problem.setStatus(HttpStatus.CONFLICT.value());
         problem.setDetail(ex.getMessage());

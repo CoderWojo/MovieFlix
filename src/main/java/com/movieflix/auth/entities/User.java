@@ -3,6 +3,7 @@ package com.movieflix.auth.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +44,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
+    @NotNull
     private UserRole role;
 
     private boolean isEnabled = true;
@@ -67,7 +69,23 @@ public class User implements UserDetails {
 
     @Override   // unique email
     public String getUsername() {
-        return email;
+        return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.isAccountNonExpired;
+    }
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.isAccountNonLocked;
+    }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.isCredentialsNonExpired;
+    }
+    @Override
+    public boolean isEnabled() {
+        return this.isEnabled;
+    }
 }

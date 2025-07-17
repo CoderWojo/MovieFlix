@@ -24,7 +24,7 @@ public class RefreshTokenService {
     public RefreshToken generateRefreshToken(User user) {
         String token = UUID.randomUUID().toString();
         // 7 dni1000 * 60 * 60 * 24 * 7
-        long refreshTokenValidityMillis = 1000 * 30;
+        long refreshTokenValidityMillis = 1000 * 15;//1000 * 30;
         RefreshToken refreshToken = RefreshToken
                 .builder()
                 .token(token)
@@ -42,8 +42,10 @@ public class RefreshTokenService {
         if (refToken.getExpirationTime().compareTo(Instant.now()) < 0) {
             // out of date
             refreshTokenRepository.delete(refToken);
-            throw new RefreshTokenOutOfDateException(token);
+            throw new RefreshTokenOutOfDateException();
         }
+        // token is good, wysylamy nowy, kasujemy stary
+
 
         return refToken;
     }

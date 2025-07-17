@@ -21,6 +21,10 @@ public class AuthMapper {
                 .role(UserRole.USER)
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .username(registerRequest.getUsername())
+                .isEnabled(true)
+                .isAccountNonExpired(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
                 .build();
     }
 }

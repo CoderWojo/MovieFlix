@@ -27,7 +27,7 @@ public class MovieController {
         this.movieMapper = movieMapper;
     }
 
-    @PreAuthorize("hasAuthority=('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add-movie")
     public ResponseEntity<MovieDto> addMovieHandler(@RequestPart(value = "movie", required = true) String strDto,
                                                     @RequestPart("file") MultipartFile file) throws IOException {
@@ -55,6 +55,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.updateMovie(movieId, dto, file));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{movieId}")
     public ResponseEntity<String> deleteMovieHandler(@PathVariable Integer movieId) throws IOException {
         return ResponseEntity.ok(movieService.deleteMovie(movieId));

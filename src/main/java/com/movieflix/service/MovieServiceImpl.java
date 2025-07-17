@@ -27,7 +27,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final FileService fileService;
-    private MovieMapper movieMapper;
+    private final MovieMapper movieMapper;
 
     @Value("${base.url}")
     private String baseUrl;
