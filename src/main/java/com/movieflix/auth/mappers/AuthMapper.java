@@ -2,7 +2,7 @@ package com.movieflix.auth.mappers;
 
 import com.movieflix.auth.entities.User;
 import com.movieflix.auth.entities.UserRole;
-import com.movieflix.auth.model.RegisterRequest;
+import com.movieflix.auth.dto.RegisterRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 

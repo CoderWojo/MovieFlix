@@ -4,9 +4,9 @@ import com.movieflix.auth.entities.RefreshToken;
 import com.movieflix.auth.entities.User;
 import com.movieflix.auth.exceptions.UserAlreadyExistsException;
 import com.movieflix.auth.mappers.AuthMapper;
-import com.movieflix.auth.model.AuthResponse;
-import com.movieflix.auth.model.LoginRequest;
-import com.movieflix.auth.model.RegisterRequest;
+import com.movieflix.auth.dto.AuthResponse;
+import com.movieflix.auth.dto.LoginRequest;
+import com.movieflix.auth.dto.RegisterRequest;
 import com.movieflix.auth.repositories.UserRepository;
 
 import org.springframework.security.authentication.AuthenticationManager;

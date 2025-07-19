@@ -10,6 +10,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: wojciechwazny444@gmail.com
+    password: toix rdia cmnn jamh
 
 logging:
   level:
@@ -22,6 +27,9 @@ logging:
 project:
   posters:
     path: posters
+  mail:
+    name: wojciechwazny444@gmail.com
+    subject: Verification code.
 
 base:
   url: http://localhost:8080/file/

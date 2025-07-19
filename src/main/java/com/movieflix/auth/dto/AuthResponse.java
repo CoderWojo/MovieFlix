@@ -1,4 +1,4 @@
-package com.movieflix.auth.model;
+package com.movieflix.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginRequest {
+public class AuthResponse {
 
-    private String username;
+//    odpowiedź na rejestrację
 
-    private String password;
+    private String accessToken;
+
+    private String refreshToken;
 }

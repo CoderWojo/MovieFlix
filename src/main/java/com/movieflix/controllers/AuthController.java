@@ -2,10 +2,10 @@ package com.movieflix.controllers;
 
 import com.movieflix.auth.entities.RefreshToken;
 import com.movieflix.auth.entities.User;
-import com.movieflix.auth.model.AuthResponse;
-import com.movieflix.auth.model.LoginRequest;
-import com.movieflix.auth.model.RefreshTokenRequest;
-import com.movieflix.auth.model.RegisterRequest;
+import com.movieflix.auth.dto.AuthResponse;
+import com.movieflix.auth.dto.LoginRequest;
+import com.movieflix.auth.dto.RefreshTokenRequest;
+import com.movieflix.auth.dto.RegisterRequest;
 import com.movieflix.auth.services.AuthService;
 import com.movieflix.auth.services.JwtService;
 import com.movieflix.auth.services.RefreshTokenService;

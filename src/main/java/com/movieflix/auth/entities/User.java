@@ -1,5 +1,6 @@
 package com.movieflix.auth.entities;
 
+import com.movieflix.entities.ForgotPassword;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -55,6 +56,9 @@ public class User implements UserDetails {
     private boolean isAccountNonLocked = true;
 
     private boolean isAccountNonExpired = true;
+
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
 
 //    Spring Security używa tej metody do sprawdzenia @PreAuthorized()
     @Override

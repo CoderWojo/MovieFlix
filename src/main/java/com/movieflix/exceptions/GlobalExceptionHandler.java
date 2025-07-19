@@ -38,14 +38,15 @@ public class GlobalExceptionHandler {
             UserAlreadyExistsException.class,
             UsernameNotFoundException.class,
             BadCredentialsException.class,
-            RefreshTokenOutOfDateException.class
+            RefreshTokenOutOfDateException.class,
+            UserNotFoundException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus status;
 
         if(ex instanceof FileAlreadyExistsException || ex instanceof UserAlreadyExistsException) {
             status = HttpStatus.CONFLICT;
-        } else if(ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
+        } else if(ex instanceof UserNotFoundException || ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
             status = HttpStatus.NOT_FOUND;
         } else if(ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException ||ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
             status = HttpStatus.BAD_REQUEST;

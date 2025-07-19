@@ -1,4 +1,4 @@
-package com.movieflix.auth.model;
+package com.movieflix.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
