@@ -1,10 +1,12 @@
 package com.movieflix.auth.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
 
 
 @Service
@@ -38,28 +42,57 @@ public class AuthFilterService extends OncePerRequestFilter {
         String jwt;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            System.out.println("ZADEN");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // extract JWT from header
+
         jwt = authHeader.substring(7);
-        // extract username from JWT
-        String username = jwtService.extractUsername(jwt);
+
+        String username;
+        try {
+            username = jwtService.extractUsername(jwt); // throws ExpiredJwtException
+        } catch(ExpiredJwtException ex) {
+
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.setContentType("application/json");    // określamy no bo Postman nieodczyta jakiego formatu jest odp i niepokoloruje tekstu w body
+            /* Do odpowiedzi API (JSON, XML, HTML) — używaj write(String)
+Do debugowania lub System.out stylu — print(...) wystarczy, ale nie w produkcyjnym API
+*/
+            String json = getString(request, ex);
+            response.getWriter()
+                   .write(json);
+
+           return;  // nie przekazuj dalej, tak robimy gdy coś złego się stało bo nie chcemy aby inne filtry a później kontrolery obsugiwały to żądanie , może się to wiązać z próbą nadpisania odpowiedzi(IllegalStateException: Cannot call sendError() after the response has been commited)
+        }
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//            System.out.println("JEDEN");
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
-//                System.out.println("DWA");
+//  UsernamePasswordAuthenticationToken konstruktor przyjmuje userDetails obiekt (nasz User)
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
                         (userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
             }
         }
-//        System.out.println("TRZY");
         filterChain.doFilter(request, response);
+    }
+
+//    oznaczamy static bo nie używa 'this.' - korzysta tylko z danych które otrzymała jako parametry i swoich
+    private static String getString(HttpServletRequest request, ExpiredJwtException ex) {
+        String timestamp = LocalDateTime.now().toString();
+        Integer status = HttpStatus.BAD_REQUEST.value();
+        String exception = ex.getClass().getSimpleName();
+        String message = ex.getMessage();
+        String path = request.getRequestURI();
+        return """
+               {
+                "timestamp": "%s",
+                "status": "%d",
+                "exception": "%s",
+                "message": "%s",
+                "path": "%s"
+               }
+               """.formatted(timestamp, status, exception, message, path);
     }
 }

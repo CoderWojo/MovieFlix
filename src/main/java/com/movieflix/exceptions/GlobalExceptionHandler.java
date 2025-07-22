@@ -2,6 +2,7 @@ package com.movieflix.exceptions;
 
 import com.movieflix.auth.exceptions.RefreshTokenOutOfDateException;
 import com.movieflix.auth.exceptions.UserAlreadyExistsException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.coyote.BadRequestException;
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
 //    Slf4j nie loguje, tylko przekazuje logi dalej do prawdziwego systemu logowania np Logback
-    private static Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({
 //            FileAlreadyExistsException.class,
@@ -46,7 +47,11 @@ public class GlobalExceptionHandler {
             ForgotPasswordNotFound.class,
             ExpiredOtpException.class,
             ExpectedForgotPasswordNotFound.class,
-            ConstraintViolationException.class
+            ConstraintViolationException.class,
+            UserNotAuthenticated.class,
+            NotTheSameOldPasswordException.class,
+            ExpiredJwtException.class,
+            NewPasswordTheSameAsOldException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus status = getHttpStatus(ex);
@@ -69,11 +74,12 @@ public class GlobalExceptionHandler {
     private static HttpStatus getHttpStatus(Exception ex) {
         HttpStatus status;
 
+//        ExpiredJwtException jest rzucany w filtrze w metodzie jwtService.extractUsername(jwt); (extractAllclaims) i nie dochodzi do warstwy kontrolerów z której to właśnie byłby wyłapany przez ten nasz Handler
         if(ex instanceof FileAlreadyExistsException || ex instanceof UserAlreadyExistsException) {
             status = HttpStatus.CONFLICT;
         } else if(ex instanceof ExpectedForgotPasswordNotFound || ex instanceof ForgotPasswordNotFound || ex instanceof UserNotFoundException || ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
             status = HttpStatus.NOT_FOUND;
-        } else if(ex instanceof ConstraintViolationException || ex instanceof ExpiredOtpException || ex instanceof NotTheSamePasswordException || ex instanceof InvalidVerificationCodeException || ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException || ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
+        } else if(ex instanceof NewPasswordTheSameAsOldException || ex instanceof NotTheSameOldPasswordException || ex instanceof UserNotAuthenticated || ex instanceof ConstraintViolationException || ex instanceof ExpiredOtpException || ex instanceof NotTheSamePasswordException || ex instanceof InvalidVerificationCodeException || ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException || ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
             status = HttpStatus.BAD_REQUEST;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -83,7 +89,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileAlreadyExistsException.class)
     public ProblemDetail handleFileAlreadyExistsException(FileAlreadyExistsException ex, HttpServletRequest request) throws URISyntaxException {
-//        Spring + Jackson automatycznie wrzucą te pola do JSON'a jako top-level (czyli na głównym poziomie) i zwroca responseEntity
+
+        //        Spring + Jackson automatycznie wrzucą te pola do JSON'a jako top-level (czyli na głównym poziomie) i zwroca responseEntity
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
 //        problem.setStatus(HttpStatus.CONFLICT.value());
         problem.setDetail(ex.getMessage());

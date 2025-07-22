@@ -2,7 +2,6 @@ package com.movieflix.service;
 
 import com.movieflix.auth.entities.User;
 import com.movieflix.auth.repositories.UserRepository;
-import com.movieflix.auth.services.JwtService;
 import com.movieflix.dto.VerifyEmailAndSendCodeRequest;
 import com.movieflix.dto.MailBody;
 import com.movieflix.dto.MessageDto;
@@ -94,7 +93,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
         if(expectedForgotPassword.getExpirationTime().isBefore(LocalDateTime.now())) {
             throw new ExpiredOtpException();
         } if(!code.equals(expectedOtp)) {
-            throw new NotTheSamePasswordException("Passwords are not the same");
+            throw new NotTheSameOtpException("Passwords are not the same");
         }
 
         return new MessageDto("Verification went successfully.", true);
@@ -119,12 +118,12 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
         }
 
         if(!newPassword.equals(repeatedPass)) {
-            throw new NotTheSamePasswordException("Passwords are not the same! Please correct them!");
+            throw new NotTheSameOtpException("Passwords are not the same! Please correct them!");
         }
 
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         u.setPassword(encodedNewPassword);
-        int updatedRecords = userRepository.updateOtp(email, encodedNewPassword);
+        int updatedRecords = userRepository.updatePassword(email, encodedNewPassword);
 
         return new MessageDto("Updated: " + updatedRecords + " records.", true);
     }

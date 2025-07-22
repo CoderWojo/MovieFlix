@@ -61,8 +61,9 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest loginRequest) {
 //        authenticationManager.authenticate() automatycznie weryfikuje credentials (czy taki user istnieje w bazie) i haslo encoduje i porównuje.
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()) // zauważ że hasło nie szyfrujemy, robi to DaoAuthenticationProvider
         );
+        // ^ jeśli username sie zgadza i haslo, to AuthenticationProvider tworzy nowy Token z UserDetails i Manager odbiera ten token i go zapisuję w SecurityContextHolder
         // ^ sprawdza poprawność danych , a poniższa ustawia w kontekscie obj. authentication, wyrzuca AuthenticationException a dokłądniej BadCredentialsException
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String username = ((User) authentication.getPrincipal()).getUsername();    // zwraca User no bo User implementuje UserDetails

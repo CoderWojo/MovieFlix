@@ -43,6 +43,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
+//    Jpa nie wie że to enum. a co za tym idzie db nie wie jaki typ kolumny ustawić. musimy go jasno określić poprzez EnumType
     @Enumerated(EnumType.STRING)
     @NotNull
     private UserRole role;

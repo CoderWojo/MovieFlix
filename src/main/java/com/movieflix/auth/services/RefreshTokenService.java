@@ -21,10 +21,11 @@ public class RefreshTokenService {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+//    TODO: dorozum ten refreshtoken
     public RefreshToken generateRefreshToken(User user) {
         String token = UUID.randomUUID().toString();
         // 7 dni1000 * 60 * 60 * 24 * 7
-        long refreshTokenValidityMillis = 1000 * 15;//1000 * 30;
+        long refreshTokenValidityMillis = 1000 * 60 * 30;//30min
         RefreshToken refreshToken = RefreshToken
                 .builder()
                 .token(token)

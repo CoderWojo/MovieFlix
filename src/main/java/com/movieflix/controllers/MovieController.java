@@ -27,6 +27,7 @@ public class MovieController {
         this.movieMapper = movieMapper;
     }
 
+//    hasAuthority rozni sie od hasRole tym że hasRole dodaje 'ROLE_' do pola role
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add-movie")
     public ResponseEntity<MovieDto> addMovieHandler(@RequestPart(value = "movie", required = true) String strDto,
