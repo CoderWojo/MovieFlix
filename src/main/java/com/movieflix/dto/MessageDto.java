@@ -1,4 +1,4 @@
 package com.movieflix.dto;
 
-public class MessageDto {
+public record MessageDto(String message, boolean success) {
 }

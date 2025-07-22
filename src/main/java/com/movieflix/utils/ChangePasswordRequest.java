@@ -1,4 +1,5 @@
 package com.movieflix.utils;
 
-public class ChangePasswordRequest {
+public record ChangePasswordRequest(String email, String password, String repeatPassword, Integer code) {
+
 }

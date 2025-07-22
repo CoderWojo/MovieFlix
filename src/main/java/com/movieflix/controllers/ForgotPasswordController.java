@@ -1,23 +1,42 @@
 package com.movieflix.controllers;
 
 
-import com.movieflix.dto.ForgotPasswordDto;
+import com.movieflix.auth.entities.User;
+import com.movieflix.dto.VerifyEmailAndSendCodeRequest;
+import com.movieflix.dto.MessageDto;
+import com.movieflix.dto.VerificationRequest;
 import com.movieflix.service.ForgotPasswordService;
+import com.movieflix.utils.ChangePasswordRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/forgot-password")
+@RequestMapping("/api/v1/forgot-password")
 public class ForgotPasswordController {
 
-    private ForgotPasswordService forgotPasswordService;
+    private final ForgotPasswordService forgotPasswordService;
 
-    @PostMapping("/verifyMail")
-    public ResponseEntity<String> verifyEmail(ForgotPasswordDto forgotPassDto) {
+    public ForgotPasswordController(ForgotPasswordService forgotPasswordService) {
+        this.forgotPasswordService = forgotPasswordService;
+    }
+
+    @PostMapping("/send-code")
+    public ResponseEntity<MessageDto> verifyEmailAndSendCode(@RequestBody VerifyEmailAndSendCodeRequest request) {
         // 1. check if the user with given mail exists save ForgotPassword entity and send mail
-        String message = forgotPasswordService.verifyEmailAndSendCode(forgotPassDto);
+        MessageDto message = forgotPasswordService.verifyEmailAndSendCode(request);
+
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<MessageDto> verifyCode(@RequestBody VerificationRequest verificationRequest) {
+        return ResponseEntity.ok(forgotPasswordService.verifyCode(verificationRequest));
+    }
+
+//    Jak coś to tylko jedna klasa może mieć @RequestBody
+    @PostMapping("/change-password")
+    public ResponseEntity<MessageDto> changePassword(@RequestBody ChangePasswordRequest passwords) {
+        MessageDto message = forgotPasswordService.changePassword(passwords);
 
         return ResponseEntity.ok(message);
     }

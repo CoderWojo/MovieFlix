@@ -15,6 +15,13 @@ spring:
     port: 587
     username: wojciechwazny444@gmail.com
     password: toix rdia cmnn jamh
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:

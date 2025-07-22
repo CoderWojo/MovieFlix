@@ -3,6 +3,7 @@ package com.movieflix.exceptions;
 import com.movieflix.auth.exceptions.RefreshTokenOutOfDateException;
 import com.movieflix.auth.exceptions.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,20 +40,16 @@ public class GlobalExceptionHandler {
             UsernameNotFoundException.class,
             BadCredentialsException.class,
             RefreshTokenOutOfDateException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            InvalidVerificationCodeException.class,
+            NotTheSamePasswordException.class,
+            ForgotPasswordNotFound.class,
+            ExpiredOtpException.class,
+            ExpectedForgotPasswordNotFound.class,
+            ConstraintViolationException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex, HttpServletRequest request) {
-        HttpStatus status;
-
-        if(ex instanceof FileAlreadyExistsException || ex instanceof UserAlreadyExistsException) {
-            status = HttpStatus.CONFLICT;
-        } else if(ex instanceof UserNotFoundException || ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-        } else if(ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException ||ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
-            status = HttpStatus.BAD_REQUEST;
-        } else {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-        }
+        HttpStatus status = getHttpStatus(ex);
 
 //        Przesyłamy na końcu obiekt 'ex' wyjątku po to aby w terminalu był wyświetlony pełny stack-trace
 //        w miejsca {} {} zostaną umieszczone kolejne argumenty po 'message'
@@ -67,6 +64,21 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(status).body(body);
+    }
+
+    private static HttpStatus getHttpStatus(Exception ex) {
+        HttpStatus status;
+
+        if(ex instanceof FileAlreadyExistsException || ex instanceof UserAlreadyExistsException) {
+            status = HttpStatus.CONFLICT;
+        } else if(ex instanceof ExpectedForgotPasswordNotFound || ex instanceof ForgotPasswordNotFound || ex instanceof UserNotFoundException || ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if(ex instanceof ConstraintViolationException || ex instanceof ExpiredOtpException || ex instanceof NotTheSamePasswordException || ex instanceof InvalidVerificationCodeException || ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException || ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
+            status = HttpStatus.BAD_REQUEST;
+        } else {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return status;
     }
 
     @ExceptionHandler(FileAlreadyExistsException.class)

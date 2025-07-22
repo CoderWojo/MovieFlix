@@ -1,4 +1,4 @@
 package com.movieflix.dto;
 
-public class VerificationRequest {
+public record VerificationRequest(Integer code, String email) {
 }

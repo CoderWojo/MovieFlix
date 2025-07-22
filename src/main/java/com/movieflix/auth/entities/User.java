@@ -6,10 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 @Table(name = "users")
 public class User implements UserDetails {
@@ -57,8 +55,8 @@ public class User implements UserDetails {
 
     private boolean isAccountNonExpired = true;
 
-    @OneToOne(mappedBy = "user")
-    private ForgotPassword forgotPassword;
+//    @OneToOne(mappedBy = "user")
+//    private ForgotPassword forgotPassword;
 
 //    Spring Security używa tej metody do sprawdzenia @PreAuthorized()
     @Override
