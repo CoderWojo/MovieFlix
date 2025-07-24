@@ -1,7 +1,7 @@
 package com.movieflix.exceptions;
 
-public class AlreadyUsedException extends RuntimeException {
-    public AlreadyUsedException(String message) {
+public class CodeAlreadyUsedException extends RuntimeException {
+    public CodeAlreadyUsedException(String message) {
         super(message);
     }
 }

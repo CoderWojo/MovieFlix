@@ -32,6 +32,9 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     @Value("${project.mail.subject}")
     private String subject;
 
+    @Value("${forgot_password.allowed_attempts}")
+    private int allowed_attempts;
+
     public ForgotPasswordServiceImpl(UserRepository userRepository, EmailService emailService, ForgotPasswordMapper mapper, ForgotPasswordRepository repository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.emailService = emailService;
@@ -84,18 +87,35 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     public MessageDto verifyCode(VerificationRequest verificationRequest) { // email, code
         String email = verificationRequest.email();
         Integer code = verificationRequest.code();
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
+        int user_id = user.getId();
         ForgotPassword expectedForgotPassword = repository.findByUser(user)
                 .orElseThrow(ExpectedForgotPasswordNotFound::new); // raczej niemozliwe, no ale ktos moglby wyslac taki request
-        Integer expectedOtp = expectedForgotPassword.getOtp();
 
-        if(expectedForgotPassword.getExpirationTime().isBefore(LocalDateTime.now())) {
+        Integer expectedOtp = expectedForgotPassword.getOtp();
+        int attempts = expectedForgotPassword.getAttempts();
+
+        if(expectedForgotPassword.isUsed()) {   // U(used)
+            throw new CodeAlreadyUsedException("The code had been used by someone else.");
+        } else if(expectedForgotPassword.getExpirationTime().isBefore(LocalDateTime.now())) {   // E(expired)
             throw new ExpiredOtpException();
-        } if(!code.equals(expectedOtp)) {
-            throw new NotTheSameOtpException("Passwords are not the same");
+        } else if(attempts >= allowed_attempts) {  // A(attempts)
+            throw new TooManyAttemptsException("Too many attempts. Generate another otp.");
+        } else if(!code.equals(expectedOtp)) {  // C(code)
+            attempts += 1;
+            // update attempts column
+            repository.updateAttemptsByUserId(attempts, user_id);
+            throw new NotTheSameOtpException("Please try again.");
         }
 
+        repository.updateUsedByUserId(true, user_id);
+
+        var now = LocalDateTime.now();
+        attempts += 1;
+        repository.updateVerifiedAtByUserId(now, user_id);
+        repository.updateAttemptsByUserId(attempts, user_id);
         return new MessageDto("Verification went successfully.", true);
     }
 
@@ -118,7 +138,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
         }
 
         if(!newPassword.equals(repeatedPass)) {
-            throw new NotTheSameOtpException("Passwords are not the same! Please correct them!");
+            throw new RepeatedPasswordNotTheSameAsNew("Passwords are not the same! Please correct them!");
         }
 
         String encodedNewPassword = passwordEncoder.encode(newPassword);

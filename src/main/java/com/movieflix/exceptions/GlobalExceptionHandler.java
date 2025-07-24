@@ -51,7 +51,11 @@ public class GlobalExceptionHandler {
             UserNotAuthenticated.class,
             NotTheSameOldPasswordException.class,
             ExpiredJwtException.class,
-            NewPasswordTheSameAsOldException.class
+            NewPasswordTheSameAsOldException.class,
+            NotTheSameOtpException.class,
+            RepeatedPasswordNotTheSameAsNew.class,
+            CodeAlreadyUsedException.class,
+            TooManyAttemptsException.class
     })
     public ResponseEntity<ApiError> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus status = getHttpStatus(ex);
@@ -79,7 +83,7 @@ public class GlobalExceptionHandler {
             status = HttpStatus.CONFLICT;
         } else if(ex instanceof ExpectedForgotPasswordNotFound || ex instanceof ForgotPasswordNotFound || ex instanceof UserNotFoundException || ex instanceof FileNotFoundException || ex instanceof MovieNotFoundException || ex instanceof UsernameNotFoundException) {
             status = HttpStatus.NOT_FOUND;
-        } else if(ex instanceof NewPasswordTheSameAsOldException || ex instanceof NotTheSameOldPasswordException || ex instanceof UserNotAuthenticated || ex instanceof ConstraintViolationException || ex instanceof ExpiredOtpException || ex instanceof NotTheSamePasswordException || ex instanceof InvalidVerificationCodeException || ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException || ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
+        } else if(ex instanceof TooManyAttemptsException || ex instanceof CodeAlreadyUsedException || ex instanceof RepeatedPasswordNotTheSameAsNew || ex instanceof NotTheSameOtpException || ex instanceof NewPasswordTheSameAsOldException || ex instanceof NotTheSameOldPasswordException || ex instanceof UserNotAuthenticated || ex instanceof ConstraintViolationException || ex instanceof ExpiredOtpException || ex instanceof NotTheSamePasswordException || ex instanceof InvalidVerificationCodeException || ex instanceof EmptyFileException || ex instanceof RefreshTokenOutOfDateException || ex instanceof BadRequestException || ex instanceof BadCredentialsException) {
             status = HttpStatus.BAD_REQUEST;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
