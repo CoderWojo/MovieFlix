@@ -28,6 +28,7 @@ logging:
     org:
       springframework:
         security: DEBUG
+        security.web.access: DEBUG
     org.hibernate.SQL: #DEBUG
     org.hibernate.orm.jdbc.bind: #TRACE
 

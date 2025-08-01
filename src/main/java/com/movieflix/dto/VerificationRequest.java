@@ -1,4 +1,7 @@
 package com.movieflix.dto;
 
-public record VerificationRequest(Integer code, String email) {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record VerificationRequest(@NotBlank Integer code, @NotBlank @Email String email) {
 }

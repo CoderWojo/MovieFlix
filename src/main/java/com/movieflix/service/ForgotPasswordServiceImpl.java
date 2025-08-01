@@ -64,7 +64,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
         // zapisz ForgotPassword w bazie
         // note that expirationTime is set in mapper class
-        ForgotPassword forgotPassword = mapper.forgotPasswordDtoToForgotPassword(forgotPassDto, otp, u);
+        ForgotPassword forgotPassword = mapper.forgotPasswordDtoToForgotPassword(otp, u);
         ForgotPassword saved = repository.save(forgotPassword);
 
         MailBody mailBody = MailBody.builder()

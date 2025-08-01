@@ -33,7 +33,7 @@ public class FileController {
     }
 
     @GetMapping("/{fileName}")
-    public ResponseEntity<InputStreamResource> serveFileHandler(@PathVariable String fileName, HttpServletResponse response) throws FileNotFoundException, IOException {
+    public ResponseEntity<InputStreamResource> serveFileHandler(@PathVariable String fileName) throws FileNotFoundException, IOException {
 //        pobierz z warstwy serwisowej strumień do odczytu postera
         InputStream resourceFile = fileService.getResourceFile(fileName);
 

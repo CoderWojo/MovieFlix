@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Component
 public class ForgotPasswordMapper {
 
-    public ForgotPassword forgotPasswordDtoToForgotPassword(VerifyEmailAndSendCodeRequest dto, Integer otp, User user) {
+    public ForgotPassword forgotPasswordDtoToForgotPassword(Integer otp, User user) {
         LocalDateTime expTime = LocalDateTime.now().plusMinutes(10);
 
         return ForgotPassword.builder()

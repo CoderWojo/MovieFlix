@@ -9,6 +9,7 @@ import com.movieflix.auth.dto.LoginRequest;
 import com.movieflix.auth.dto.RegisterRequest;
 import com.movieflix.auth.repositories.UserRepository;
 
+import com.movieflix.exceptions.NotTheSamePasswordException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,18 +36,21 @@ public class AuthServiceImpl implements AuthService {
 
 
     public AuthResponse register(RegisterRequest registerRequest) {
-//        sprawdzmy czy email juz nie jest uzyty
-
         var user = authMapper.registerRequestToUser(registerRequest);
-        String emailRequest = user.getEmail();
+        String emailRequest = registerRequest.getEmail();
         String usernameRequest = registerRequest.getUsername();
+
         if(userRepository.findByEmail(emailRequest).isPresent()) {
             throw new UserAlreadyExistsException("User with given email already exists! Please change.");
         }
-        if (userRepository.findByUsername(usernameRequest).isPresent()) {
+        if(userRepository.findByUsername(usernameRequest).isPresent()) {
             throw new UserAlreadyExistsException("User with given username already exists! Please change.");
         }
 
+//        sprawdz czy hasla takie same
+        if(!registerRequest.getPassword().equals(registerRequest.getRepeat())) {
+            throw new NotTheSamePasswordException("Passwords must be the same.");
+        }
         User savedUser = userRepository.save(user);
 
         String accessToken = jwtService.generateToken(savedUser.getUsername());

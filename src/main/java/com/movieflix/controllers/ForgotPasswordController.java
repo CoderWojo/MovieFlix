@@ -7,6 +7,7 @@ import com.movieflix.dto.MessageDto;
 import com.movieflix.dto.VerificationRequest;
 import com.movieflix.service.ForgotPasswordService;
 import com.movieflix.utils.ChangePasswordRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class ForgotPasswordController {
     }
 
     @PostMapping("/send-code")
-    public ResponseEntity<MessageDto> verifyEmailAndSendCode(@RequestBody VerifyEmailAndSendCodeRequest request) {
+    public ResponseEntity<MessageDto> verifyEmailAndSendCode(@RequestBody @Valid VerifyEmailAndSendCodeRequest request) {
         // 1. check if the user with given mail exists save ForgotPassword entity and send mail
         MessageDto message = forgotPasswordService.verifyEmailAndSendCode(request);
 
@@ -29,7 +30,7 @@ public class ForgotPasswordController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<MessageDto> verifyCode(@RequestBody VerificationRequest verificationRequest) {
+    public ResponseEntity<MessageDto> verifyCode(@RequestBody @Valid VerificationRequest verificationRequest) {
         return ResponseEntity.ok(forgotPasswordService.verifyCode(verificationRequest));
     }
 

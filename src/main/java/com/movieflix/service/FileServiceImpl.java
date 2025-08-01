@@ -50,7 +50,6 @@ public class FileServiceImpl implements FileService {
             throw new FileNotFoundException("Poster with name: " + filename + " does not exist!");
         }
 
-
         return new FileInputStream(readDir.toFile());
     }
 }
