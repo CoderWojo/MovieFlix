@@ -76,7 +76,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 // przyjmuje 3 param. których nie znamy ot tak w EmailService
         emailService.sendSimpleMailMessage(mailBody);
 
-        return new MessageDto("Verification code is sent to your email successfully!", true);
+        return new MessageDto("Code is sent successfully!", true);
     }
 
     private Integer generateOtp() {

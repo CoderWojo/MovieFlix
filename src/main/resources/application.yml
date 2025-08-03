@@ -13,8 +13,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: wojciechwazny444@gmail.com
-    password: toix rdia cmnn jamh
+    username: wojciechwazny4444@gmail.com
+    password: eheq ixes wjpi nllj
     protocol: smtp
     properties:
       mail:
@@ -36,7 +36,7 @@ project:
   posters:
     path: posters
   mail:
-    name: wojciechwazny444@gmail.com
+    name: wojciechwazny4444@gmail.com
     subject: Verification code.
 
 base:
