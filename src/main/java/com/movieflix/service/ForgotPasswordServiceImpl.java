@@ -12,6 +12,7 @@ import com.movieflix.mapper.ForgotPasswordMapper;
 import com.movieflix.repository.ForgotPasswordRepository;
 import com.movieflix.utils.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,13 +50,18 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     @Transactional // bo nie chcemy aby zapisal sie kod w bazie a userowi nie wyslal mail
     public MessageDto verifyEmailAndSendCode(VerifyEmailAndSendCodeRequest forgotPassDto) {
 
-        String email =  forgotPassDto.email();
+        String email = forgotPassDto.email();
         User u = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 //        sprawdź czy nie istenije już jakiś kod w bazie dla tego użytkownika
         Optional<ForgotPassword> OpForgotPassword = repository.findByUser(u);
-        // kasujemy stary forgotPassword
-        OpForgotPassword.ifPresent(repository::delete);
+        // kasujemy stary forgotPassword ale musimy upewnić się że wcześniejszy forgotpassword na pewno istnieje
+        try {
+            OpForgotPassword.ifPresent(repository::delete);
+        } catch(ObjectOptimisticLockingFailureException e) {
+//        wyrzucany gdy user kliknie niemal jednocześnie przycisk wyslij kod resetujący
+            System.out.println("ForgotPassword already deleted by another thread.");
+        }
 
 // wymusza delete od razu a nie przed samym zamknieciem transakcji, bo wtedy były jednoczesnie 2 takie same forgotPassword z tym samym user_id jesli ktos 2. raz resetowal haslo
         repository.flush();
@@ -76,7 +82,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 // przyjmuje 3 param. których nie znamy ot tak w EmailService
         emailService.sendSimpleMailMessage(mailBody);
 
-        return new MessageDto("Code is sent successfully!", true);
+        return new MessageDto("Kod został wysłany. Sprawdź pocztę.", true);
     }
 
     private Integer generateOtp() {
@@ -97,17 +103,17 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
         Integer expectedOtp = expectedForgotPassword.getOtp();
         int attempts = expectedForgotPassword.getAttempts();
 
-        if(expectedForgotPassword.isUsed()) {   // U(used)
+        if (expectedForgotPassword.isUsed()) {   // U(used)
             throw new CodeAlreadyUsedException("The code had been used by someone else.");
-        } else if(expectedForgotPassword.getExpirationTime().isBefore(LocalDateTime.now())) {   // E(expired)
+        } else if (expectedForgotPassword.getExpirationTime().isBefore(LocalDateTime.now())) {   // E(expired)
             throw new ExpiredOtpException();
-        } else if(attempts >= allowed_attempts) {  // A(attempts)
-            throw new TooManyAttemptsException("Too many attempts. Generate another otp.");
-        } else if(!code.equals(expectedOtp)) {  // C(code)
+        } else if (attempts >= allowed_attempts) {  // A(attempts)
+            throw new TooManyAttemptsException("Za dużo prób. Wygeneruj nowe hasło");
+        } else if (!code.equals(expectedOtp)) {  // C(code)
             attempts += 1;
             // update attempts column
             repository.updateAttemptsByUserId(attempts, user_id);
-            throw new NotTheSameOtpException("Please try again.");
+            throw new NotTheSameOtpException("Podany kod jest niepoprawny.");
         }
 
         repository.updateUsedByUserId(true, user_id);
@@ -133,18 +139,16 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 //        w dodatku sprawdzamy czy nie wygasł bo ktos moglby skonczyc na wyslaniu kodu ale nie wyslaniu
         ForgotPassword fp = repository.findByUserAndOtp(u, code)
                 .orElseThrow(ForgotPasswordNotFound::new);
-        if(fp.getExpirationTime().isBefore(LocalDateTime.now())) {
+        if (fp.getExpirationTime().isBefore(LocalDateTime.now())) {
             throw new ExpiredOtpException();
         }
 
-        if(!newPassword.equals(repeatedPass)) {
-            throw new RepeatedPasswordNotTheSameAsNew("Passwords are not the same! Please correct them!");
+        if (!newPassword.equals(repeatedPass)) {
+            throw new RepeatedPasswordNotTheSameAsNew("Powtórzone hasło nie jest takie samo jak pierwsze.");
         }
 
         String encodedNewPassword = passwordEncoder.encode(newPassword);
-        u.setPassword(encodedNewPassword);
-        int updatedRecords = userRepository.updatePassword(email, encodedNewPassword);
-
-        return new MessageDto("Updated: " + updatedRecords + " records.", true);
+        userRepository.updatePassword(email, encodedNewPassword);
+        return new MessageDto("Hasło zostało zmienione pomyślnie! Możesz się teraz zalogować.", true);
     }
 }

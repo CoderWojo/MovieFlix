@@ -17,10 +17,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     int updatePasswordByOwn(@Param("username") String username, @Param("password") String newPassword);
 
 //    W JPQL nie używamy nazw tabel tylko nazw encji
-    @Query("UPDATE User u SET u.password = :password WHERE u.username = :username")
+    @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
     @Modifying  // Spring Data przy zapytaniu UPDATE zwraca liczbę zmodyfikowanych wierszy
     @Transactional
-    int updatePassword(@Param("username") String username, @Param("password") String newPassword);
+    int updatePassword(@Param("email") String email, @Param("password") String newPassword);
 
     Optional<User> findByUsername(String username);
 
