@@ -9,6 +9,7 @@ import com.movieflix.auth.dto.RegisterRequest;
 import com.movieflix.auth.services.AuthService;
 import com.movieflix.auth.services.JwtService;
 import com.movieflix.auth.services.RefreshTokenService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +31,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest registerRequest, HttpServletResponse response) {
         return ResponseEntity.status(HttpStatus.CREATED.value())
-                .body(authService.register(registerRequest));
+                .body(authService.register(registerRequest, response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest));
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(loginRequest, response));
     }
 
 //    ten endpoint wywołujemy bez jwt , no bo przecież właśnie on jest już wygasły
@@ -51,7 +52,7 @@ public class AuthController {
 
         return ResponseEntity.ok(AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshTokenService.generateRefreshToken(user).getToken())
+//                .refreshToken(refreshTokenService.generateRefreshToken(user).getToken())
                 .build());
 
     }

@@ -50,12 +50,13 @@ public class AuthFilterService extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         String username;
+        System.out.println("JESTEM TU");
         try {
             username = jwtService.extractUsername(jwt); // throws ExpiredJwtException
         } catch(ExpiredJwtException ex) {
 
-            response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.setContentType("application/json");    // określamy no bo Postman nieodczyta jakiego formatu jest odp i niepokoloruje tekstu w body
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
             /* Do odpowiedzi API (JSON, XML, HTML) — używaj write(String)
 Do debugowania lub System.out stylu — print(...) wystarczy, ale nie w produkcyjnym API
 */

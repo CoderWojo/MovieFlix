@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface MovieService {
 
+    List<MovieDto> getThreeMovies();
+
 //    1. bez posterFilename oraz posterURL oraz id bo ono zostanie dodane automatycznie przez db
     MovieDto addMovie(MovieDto movieRequestDto, MultipartFile file) throws IOException;
 

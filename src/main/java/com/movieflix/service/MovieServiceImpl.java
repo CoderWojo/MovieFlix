@@ -41,7 +41,16 @@ public class MovieServiceImpl implements MovieService {
         this.movieMapper = mapper;
     }
 
-//    pozwalamy na nieuzupełnienie posterFilename w json ale wymagamy aby w RequestPart ten poster był obecny
+    @Override
+    public List<MovieDto> getThreeMovies() {
+        return movieRepository.findAll()
+                .stream()
+                .limit(3)
+                .map(movieMapper::movieToDto)
+                .toList();
+    }
+
+    //    pozwalamy na nieuzupełnienie posterFilename w json ale wymagamy aby w RequestPart ten poster był obecny
     @Override
     public MovieDto addMovie(MovieDto movieDto, MultipartFile file) throws IOException {
         // 1. upload a file

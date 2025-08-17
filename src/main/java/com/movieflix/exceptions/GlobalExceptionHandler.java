@@ -56,7 +56,6 @@ public class GlobalExceptionHandler {
             ConstraintViolationException.class,
             UserNotAuthenticated.class,
             NotTheSameOldPasswordException.class,
-            ExpiredJwtException.class,
             NewPasswordTheSameAsOldException.class,
             NotTheSameOtpException.class,
             RepeatedPasswordNotTheSameAsNew.class,

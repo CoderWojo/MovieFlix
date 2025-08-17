@@ -48,6 +48,11 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getAllMovies());
     }
 
+    @GetMapping("/firstThree")
+    public ResponseEntity<List<MovieDto>> getThreeMovies() {
+        return ResponseEntity.ok(movieService.getThreeMovies());
+    }
+
     @PutMapping("/update/{movieId}")
     public ResponseEntity<MovieDto> updateMoviehandler(@PathVariable Integer movieId,
                                                        @RequestPart("movie") String movieDto,
@@ -63,6 +68,7 @@ public class MovieController {
     }
 
     @GetMapping("/allMoviesPage")
+    @PreAuthorize()
     public ResponseEntity<MoviePageResponse> getAllMoviesWithPagination(@RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
                                                                         @RequestParam( name = "size", defaultValue = AppConstants.PAGE_SIZE) Integer pageSize) {
         return ResponseEntity.ok(movieService.getAllMoviesWithPagination(pageNumber, pageSize));

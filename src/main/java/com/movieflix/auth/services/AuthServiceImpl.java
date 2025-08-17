@@ -10,12 +10,17 @@ import com.movieflix.auth.dto.RegisterRequest;
 import com.movieflix.auth.repositories.UserRepository;
 
 import com.movieflix.exceptions.NotTheSamePasswordException;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -35,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    public AuthResponse register(RegisterRequest registerRequest) {
+    public AuthResponse register(RegisterRequest registerRequest, HttpServletResponse response) {
         var user = authMapper.registerRequestToUser(registerRequest);
         String emailRequest = registerRequest.getEmail();
         String usernameRequest = registerRequest.getUsername();
@@ -56,13 +61,20 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateToken(savedUser.getUsername());
         RefreshToken refreshToken = refreshTokenService.generateRefreshToken(savedUser);
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+//                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
-    public AuthResponse login(LoginRequest loginRequest) {
+    public AuthResponse login(LoginRequest loginRequest, HttpServletResponse response) {
 //        authenticationManager.authenticate() automatycznie weryfikuje credentials (czy taki user istnieje w bazie) i haslo encoduje i porównuje.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()) // zauważ że hasło nie szyfrujemy, robi to DaoAuthenticationProvider
@@ -80,10 +92,19 @@ public class AuthServiceImpl implements AuthService {
 
         RefreshToken refreshToken = refreshTokenService.generateRefreshToken(userDb);
 
+//        zapisujemy refreshToken w ciasteczku
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                .httpOnly(false)
+                .secure(false)
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         return AuthResponse
                 .builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+//                .refreshToken(refreshToken.getToken())
                 .build();
     }
 }
