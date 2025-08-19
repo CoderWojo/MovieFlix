@@ -18,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -77,11 +79,15 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest loginRequest, HttpServletResponse response) {
 //        authenticationManager.authenticate() automatycznie weryfikuje credentials (czy taki user istnieje w bazie) i haslo encoduje i porównuje.
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()) // zauważ że hasło nie szyfrujemy, robi to DaoAuthenticationProvider
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()
+                ) // zauważ że hasło nie szyfrujemy, robi to DaoAuthenticationProvider
         );
         // ^ jeśli username sie zgadza i haslo, to AuthenticationProvider tworzy nowy Token z UserDetails i Manager odbiera ten token i go zapisuję w SecurityContextHolder
         // ^ sprawdza poprawność danych , a poniższa ustawia w kontekscie obj. authentication, wyrzuca AuthenticationException a dokłądniej BadCredentialsException
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//        onAuthSuccess(authentication); // logujemy
+
         String username = ((User) authentication.getPrincipal()).getUsername();    // zwraca User no bo User implementuje UserDetails
 
 //        chyba zbedne, tylko po to aby wyrzucic wyjatek
@@ -107,4 +113,10 @@ public class AuthServiceImpl implements AuthService {
 //                .refreshToken(refreshToken.getToken())
                 .build();
     }
+
+//    private void onAuthSuccess(Authentication authentication) {
+//        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+//        System.out.println("Zalogowany z IP:" + details.getRemoteAddress());
+//        System.out.println("SessionId: " + details.getSessionId());
+//    }
 }

@@ -22,7 +22,7 @@ public interface MovieService {
 
     String deleteMovie(Integer id) throws IOException;
 
-    MoviePageResponse getAllMoviesWithPagination(Integer page, Integer pageSize);
+    MoviePageResponse getAllMoviesWithPagination(String page, String pageSize);
 
     MoviePageResponse getAllMoviesWithPaginationAndSorting(Integer page, Integer pageSize, String sortBy, String dir);
 }

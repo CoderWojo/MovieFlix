@@ -6,6 +6,7 @@ import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.service.MovieService;
 import com.movieflix.mapper.MovieMapper;
 import com.movieflix.utils.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,10 +31,10 @@ public class MovieController {
 //    hasAuthority rozni sie od hasRole tym że hasRole dodaje 'ROLE_' do pola role
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add-movie")
-    public ResponseEntity<MovieDto> addMovieHandler(@RequestPart(value = "movie", required = true) String strDto,
+    public ResponseEntity<MovieDto> addMovieHandler(@RequestPart(value = "movie") @Valid MovieDto movieDto,
                                                     @RequestPart("file") MultipartFile file) throws IOException {
-        MovieDto dto = movieMapper.strToDto(strDto);
-        MovieDto savedDto = movieService.addMovie(dto, file);
+//        MovieDto dto = movieMapper.strToDto(movie);
+        MovieDto savedDto = movieService.addMovie(movieDto, file);
 
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
@@ -68,9 +69,10 @@ public class MovieController {
     }
 
     @GetMapping("/allMoviesPage")
-    @PreAuthorize()
-    public ResponseEntity<MoviePageResponse> getAllMoviesWithPagination(@RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
-                                                                        @RequestParam( name = "size", defaultValue = AppConstants.PAGE_SIZE) Integer pageSize) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MoviePageResponse> getAllMoviesWithPagination(@RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER) String pageNumber,
+                                                                        @RequestParam(name = "size", defaultValue = AppConstants.PAGE_SIZE) String pageSize) {
+        System.out.println("strefa kontrolera");
         return ResponseEntity.ok(movieService.getAllMoviesWithPagination(pageNumber, pageSize));
     }
 

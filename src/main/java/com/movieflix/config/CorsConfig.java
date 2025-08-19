@@ -11,6 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        System.out.println("CIEKAWE");
         registry.addMapping("/**")
                 .allowedOrigins("http://127.0.0.1:5500")
                 .allowedMethods("*")

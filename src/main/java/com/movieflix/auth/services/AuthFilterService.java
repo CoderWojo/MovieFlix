@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 
 @Service
@@ -41,6 +42,8 @@ public class AuthFilterService extends OncePerRequestFilter {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String jwt;
 
+        System.out.println(Collections.list(request.getHeaderNames()));
+        System.out.println("Jwt odczytane: " + authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -57,9 +60,7 @@ public class AuthFilterService extends OncePerRequestFilter {
 
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
-            /* Do odpowiedzi API (JSON, XML, HTML) — używaj write(String)
-Do debugowania lub System.out stylu — print(...) wystarczy, ale nie w produkcyjnym API
-*/
+
             String json = getString(request, ex);
             response.getWriter()
                    .write(json);
@@ -69,11 +70,17 @@ Do debugowania lub System.out stylu — print(...) wystarczy, ale nie w produkcy
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+            System.out.println("User o takim jwt istnieje");
+            System.out.println("To on: " + userDetails.getAuthorities());
             if (jwtService.isTokenValid(jwt, userDetails)) {
 //  UsernamePasswordAuthenticationToken konstruktor przyjmuje userDetails obiekt (nasz User)
+                System.out.println("TOken jest prawidlowy");
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
                         (userDetails, null, userDetails.getAuthorities());
+
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                System.out.println("User authenticated");
             }
         }
         filterChain.doFilter(request, response);

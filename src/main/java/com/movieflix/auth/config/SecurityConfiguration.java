@@ -4,6 +4,7 @@ import com.movieflix.auth.services.AuthFilterService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,11 +30,12 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/auth/**", "/api/v1/forgot-password/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+            .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/auth/**", "/api/v1/forgot-password/**", "/file/**", "/api/v1/movie/firstThree")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(authFilterService, UsernamePasswordAuthenticationFilter.class);

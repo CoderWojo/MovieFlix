@@ -36,7 +36,7 @@ public class MovieMapper {
         dto.setMovieCast(movie.getMovieCast());
         dto.setReleaseYear(movie.getReleaseYear());
         dto.setPosterFilename(movie.getPosterFilename());
-        //url
+        dto.setPosterURL("http://localhost:8080/file/" + movie.getPosterFilename());
 
         return dto;
     }

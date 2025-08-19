@@ -26,6 +26,7 @@ public class MovieDto {
     @NotBlank(message = "Please provide movie's studio!")
     private String studio;  // wytwórnia
 
+    @NotNull
     private Set<String> movieCast;  // obsada
 
     @NotNull(message = "Please provide movie's release year!")

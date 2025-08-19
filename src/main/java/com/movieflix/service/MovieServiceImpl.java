@@ -43,16 +43,21 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public List<MovieDto> getThreeMovies() {
-        return movieRepository.findAll()
+        List<MovieDto> lista = movieRepository.findAll()
                 .stream()
                 .limit(3)
                 .map(movieMapper::movieToDto)
                 .toList();
+
+        System.out.println("Zwracamy: " + lista);
+        return lista;
     }
 
     //    pozwalamy na nieuzupełnienie posterFilename w json ale wymagamy aby w RequestPart ten poster był obecny
     @Override
     public MovieDto addMovie(MovieDto movieDto, MultipartFile file) throws IOException {
+//        Sprawdź czy wszystkie dane są poprawnie podane
+
         // 1. upload a file
         String posterFilename = fileService.uploadFile(file);
 
@@ -166,11 +171,14 @@ public class MovieServiceImpl implements MovieService {
 
 
     @Override
-    public MoviePageResponse getAllMoviesWithPagination(Integer pageNumber, Integer pageSize) {
+    public MoviePageResponse getAllMoviesWithPagination(String pageNumberStr, String pageSizeStr) {
+        int pageNumber = Integer.parseInt(pageNumberStr);
+        int pageSize = Integer.parseInt(pageSizeStr);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         Page<Movie> moviePages = movieRepository.findAll(pageable);   // getTotalPages, getTotalElements
         List<Movie> movies = moviePages.getContent();
+
 
         List<MovieDto> movieDtos = movies.stream()
                 .map(movie -> {
