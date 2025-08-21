@@ -48,15 +48,15 @@ public class AuthServiceImpl implements AuthService {
         String usernameRequest = registerRequest.getUsername();
 
         if(userRepository.findByEmail(emailRequest).isPresent()) {
-            throw new UserAlreadyExistsException("User with given email already exists! Please change.");
+            throw new UserAlreadyExistsException("Użytkownik z takim adresem email już istnieje.");
         }
         if(userRepository.findByUsername(usernameRequest).isPresent()) {
-            throw new UserAlreadyExistsException("User with given username already exists! Please change.");
+            throw new UserAlreadyExistsException("Login zajęty. Zmień go.");
         }
 
 //        sprawdz czy hasla takie same
         if(!registerRequest.getPassword().equals(registerRequest.getRepeat())) {
-            throw new NotTheSamePasswordException("Passwords must be the same.");
+            throw new NotTheSamePasswordException("Oba hasła muszą być takie same.");
         }
         User savedUser = userRepository.save(user);
 

@@ -20,7 +20,7 @@ public class RegisterRequest {
     @Email
     private String email;
 
-    @Size(min = 5)
+    @Size(min = 5, message = "Hasło musi mieć co najmniej 5 znaków.")
     private String password;
 
     @NotBlank

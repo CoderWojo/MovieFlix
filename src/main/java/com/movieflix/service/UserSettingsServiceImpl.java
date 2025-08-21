@@ -3,6 +3,7 @@ package com.movieflix.service;
 import com.movieflix.auth.entities.User;
 import com.movieflix.auth.repositories.UserRepository;
 import com.movieflix.dto.MessageDto;
+import com.movieflix.dto.UserDto;
 import com.movieflix.exceptions.*;
 import com.movieflix.utils.ChangePasswordByOwnRequest;
 import org.springframework.security.core.Authentication;
@@ -59,5 +60,15 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         int updatedRows = userRepository.updatePasswordByOwn(username, encoded);
 
         return new MessageDto("Your password has been changed.", true);
+    }
+
+    @Override
+    public UserDto me(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username).orElseThrow(
+                UserNotFoundException::new
+        );
+
+        return new UserDto(user.getUsername(), user.getRole().toString(), user.getEmail());
     }
 }
